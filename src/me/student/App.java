@@ -4,7 +4,7 @@ import me.student.WeightedGraph.Graph;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        Boolean symetrical = false;
+        Boolean symetrical = true;
         Graph g = new Graph(12);
         Coordinates3D startNode = SalesmanProblemAlgorithms.getStartNode(g);
 
@@ -23,8 +23,8 @@ public class App {
         System.out.println(" A* -> " + aStar.toString());
 
         if(
-            (g.vertices > 12 && !symetrical) ||
-            (g.vertices > 11 && symetrical)
+            (g.vertices > 13 && !symetrical) ||
+            (g.vertices > 12 && symetrical)
         ) return;
 
         // [ToDo]
@@ -33,6 +33,11 @@ public class App {
         Infos dfs = SalesmanProblemAlgorithms.tryDFS(g, startNode);
         System.out.println("DFS -> " + dfs.toString());
         // System.out.println(dfs.getPath().toString());
+
+        if(
+            (g.vertices > 12 && !symetrical) ||
+            (g.vertices > 11 && symetrical)
+        ) return;
 
         // just works :)
         Infos bfs = SalesmanProblemAlgorithms.tryBFS(g, startNode);

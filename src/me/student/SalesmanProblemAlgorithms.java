@@ -80,7 +80,7 @@ public class SalesmanProblemAlgorithms {
     }
 
     public static Coordinates3DLinkedList BFS(Graph graph, Coordinates3D startNode) {
-        List<Coordinates3DLinkedList> paths = new ArrayList<>();
+        Coordinates3DLinkedList shortestPath = null;
         Queue<Coordinates3DLinkedList> queue = new LinkedList<>();
 
         Coordinates3DLinkedList path = new Coordinates3DLinkedList();
@@ -91,18 +91,14 @@ public class SalesmanProblemAlgorithms {
             path = queue.poll();
             Coordinates3D at = path.getLast();
 
-            // If path contains all nodes it adds path to list of
-            // all possible paths.
-            // [ToDO] [optimization]
-            // There is no need to keep all paths in memmory.
-            // Here we coud run a check if this new path is shorter
-            // than the current shortest path. If it is we could
-            // make new path a new shortest path. I keep it like
-            // that to check how much memmory this approach will
-            // consume.
             if(path.size() == graph.vertices) {
                 path.add(startNode);
-                paths.add(path);
+                if(shortestPath == null) {
+                    shortestPath = path;
+                } else {
+                    if (shortestPath.getPathDistance() > path.getPathDistance())
+                        shortestPath = path;
+                }
             }
 
             List<Edge> edges = graph.adjacencylist.get(at);
@@ -114,19 +110,7 @@ public class SalesmanProblemAlgorithms {
                 newPath.add(next);
                 queue.add(newPath);
             }
-            
         }
-
-        Coordinates3DLinkedList shortestPath = paths.removeFirst();
-
-        for(Coordinates3DLinkedList c3dll : paths) {
-            if(
-                c3dll.getPathDistance() < shortestPath.getPathDistance() &&
-                c3dll.size() == graph.vertices + 1
-            )
-            shortestPath = c3dll;
-        }
-
 
         return shortestPath;
     }
