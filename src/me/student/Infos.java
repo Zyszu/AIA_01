@@ -35,16 +35,18 @@ public class Infos {
     public String toString() {
         String s = "";
         if (path == null) {
-            s +=  "fpc = " + String.valueOf(foundPathCost);
-            s += "; time = " + String.valueOf(time) + "ms";
-            s += "; Failed to find a path!";
+            s +=  "found_path_cost " + String.valueOf(foundPathCost);
+            s += ";finding_path_time " + String.valueOf(time);
+            s += ";memmory_consumption " + String.valueOf(memmoryConsumption);
+            s += ";visited_cities " + String.valueOf(visitedCities);
+            s += ";FAILED_TO_FIND_A_PATH";
             return s;
         }
 
-        s +=  "fpc = " + String.valueOf(foundPathCost);
-        s += "; time = " + String.valueOf(time) + "ms";
-        s += "; mc = " + String.valueOf(memmoryConsumption) + "bits";
-        s += "; ct = " + String.valueOf(visitedCities) + ";";
+        s +=  "found_path_cost " + String.valueOf(foundPathCost);
+        s += ";finding_path_time " + String.valueOf(time);
+        s += ";memmory_consumption " + String.valueOf(memmoryConsumption);
+        s += ";visited_cities " + String.valueOf(visitedCities);
 
         return s;
     }

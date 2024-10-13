@@ -24,7 +24,7 @@ public class WeightedGraph {
         public HashMap<Coordinates3D, LinkedList<Edge>> adjacencylist;
         public List<Coordinates3D> verticesList;
 
-        Graph(int vertices) {
+        Graph(int vertices, Boolean isSymetrical) {
             this.vertices = vertices;
             adjacencylist = new HashMap<>();
             verticesList  = new ArrayList<>();
@@ -36,7 +36,7 @@ public class WeightedGraph {
                 Generators.Interval y = new Generators.Interval(-100, 100);
                 Generators.Interval z = new Generators.Interval(0, 50);
 
-                Coordinates3D newC3d = Generators.getRandomCoordinates3d(x, y, z);
+                Coordinates3D newC3d = Generators.getRandomCoordinates3d(x, y, z, isSymetrical);
 
                 adjacencylist.put(
                     newC3d,

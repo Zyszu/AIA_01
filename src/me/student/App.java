@@ -4,11 +4,11 @@ import me.student.WeightedGraph.Graph;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        Boolean symetrical = true;
-        Graph g = new Graph(12);
+        Boolean isSymetrical = true;
+        Graph g = new Graph(10, isSymetrical);
         Coordinates3D startNode = SalesmanProblemAlgorithms.getStartNode(g);
 
-        if(!symetrical)
+        if(!isSymetrical)
             System.out.println("graph edges reduced by: " + g.reduceEdges(20) + "%");
         // g.printGraph();
 
@@ -23,8 +23,8 @@ public class App {
         System.out.println(" A* -> " + aStar.toString());
 
         if(
-            (g.vertices > 13 && !symetrical) ||
-            (g.vertices > 12 && symetrical)
+            (g.vertices > 13 && !isSymetrical) ||
+            (g.vertices > 12 && isSymetrical)
         ) return;
 
         // [ToDo]
@@ -35,8 +35,8 @@ public class App {
         // System.out.println(dfs.getPath().toString());
 
         if(
-            (g.vertices > 12 && !symetrical) ||
-            (g.vertices > 11 && symetrical)
+            (g.vertices > 12 && !isSymetrical) ||
+            (g.vertices > 11 && isSymetrical)
         ) return;
 
         // just works :)

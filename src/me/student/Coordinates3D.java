@@ -4,21 +4,24 @@ import java.util.List;
 
 public class Coordinates3D {
     private Integer x, y, z;
+    private Boolean symetrical;
 
-    public Coordinates3D(Integer x, Integer y, Integer z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public Coordinates3D(Integer x, Integer y, Integer z, Boolean symetrical) {
+        this.x          = x;
+        this.y          = y;
+        this.z          = z;
+        this.symetrical = symetrical;
     }
 
     public Coordinates3D(Coordinates3D coordinates3d) {
         Coordinates3D c3d = coordinates3d;
         if(c3d == null) 
-            c3d = new Coordinates3D(null, null, null);
+            c3d = new Coordinates3D(null, null, null, false);
 
-        this.x = c3d.x;
-        this.y = c3d.y;
-        this.z = c3d.z;
+        this.x          = c3d.x;
+        this.y          = c3d.y;
+        this.z          = c3d.z;
+        this.symetrical = coordinates3d.symetrical;
     }
 
     public Boolean isEqual(Coordinates3D coordinates) {
@@ -39,6 +42,7 @@ public class Coordinates3D {
             Math.pow(this.z - coordinates.z, 2)
         );
 
+        if(this.symetrical) return ans;
         if(this.z > coordinates.z) return ans * 0.9;
         if(this.z < coordinates.z) return ans * 1.1;
         return ans;

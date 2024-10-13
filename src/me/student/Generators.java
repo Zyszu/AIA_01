@@ -36,13 +36,13 @@ public class Generators {
 
     }
 
-    public static Coordinates3D getRandomCoordinates3d(Interval x, Interval y, Interval z) {
+    public static Coordinates3D getRandomCoordinates3d(Interval x, Interval y, Interval z, Boolean isSimetrical) {
         Random rand = new Random();
 
         Integer newX = rand.nextInt(x.length) + x.getStart();
         Integer newY = rand.nextInt(y.length) + y.getStart();
         Integer newZ = rand.nextInt(z.length) + z.getStart();
 
-        return new Coordinates3D(newX, newY, newZ);
+        return new Coordinates3D(newX, newY, newZ, isSimetrical);
     }
 }

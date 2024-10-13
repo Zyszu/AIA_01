@@ -219,4 +219,14 @@ public class SalesmanProblemAlgorithms {
         shortestPath.add(startNode);
         return shortestPath;
     }
+
+    public static Infos tryACO(Graph graph, Coordinates3D startNode) {
+        ACO();
+        return null;
+    }
+
+    private static Coordinates3DLinkedList ACO() {
+        return null;
+    }
+
 }
