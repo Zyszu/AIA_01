@@ -1,9 +1,12 @@
 package me.student;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
+import java.lang.Math;
 
 import me.student.Coordinates3D.Coordinates3DLinkedList;
 import me.student.WeightedGraph.Edge;
@@ -221,12 +224,184 @@ public class SalesmanProblemAlgorithms {
     }
 
     public static Infos tryACO(Graph graph, Coordinates3D startNode) {
-        ACO();
-        return null;
+        Integer number_of_ants              = 100;
+        Double  pheromone_evaporation_rate  = 0.1;
+        Double  pheromone_influence_factor  = 2.2; // alpha
+        Double  heurisic_influence_factor   = 1.0; // beta
+        Integer number_of_generations       = 50;
+        Boolean use_random_ants             = true;
+
+        long tStart = System.currentTimeMillis();
+        Coordinates3DLinkedList shortesPath = ACO(
+                                                    graph,
+                                                    startNode,
+                                                    number_of_ants,
+                                                    pheromone_evaporation_rate,
+                                                    pheromone_influence_factor,
+                                                    heurisic_influence_factor,
+                                                    number_of_generations,
+                                                    use_random_ants
+                                                );
+        // end
+        long tEnd = System.currentTimeMillis();
+        return new Infos(tEnd - tStart, 0, shortesPath);
     }
 
-    private static Coordinates3DLinkedList ACO() {
-        return null;
+    private static void updatePheromonesValue(Graph graph, HashMap<Edge, Double> pheromoneHashMap, Double this_wierd_Q, Coordinates3DLinkedList path) {
+        for(int i = 0; i < path.size() - 1; i++) {
+            Coordinates3D atNode = path.get(i);
+            Coordinates3D nextNode = path.get(i + 1);
+
+            Edge edge = graph.getEdge(atNode, nextNode);
+            Double prev_pheromones   = pheromoneHashMap.get(edge);
+            Double new_pheromones    = this_wierd_Q / path.getPathDistance();
+            Double pheromones_update = prev_pheromones + new_pheromones;
+
+            pheromoneHashMap.put(edge, pheromones_update);
+        }
+    }
+    
+    private static Coordinates3DLinkedList getAntPath(
+        Graph graph,
+        Coordinates3D startC3d,
+        HashMap<Edge, Double> pheromoneHashMap,
+        Double pheromone_influence_factor,
+        Double heurisic_influence_factor
+        ) {
+        Double proximity_reduce_constant = 10.0;
+        Coordinates3DLinkedList path = new Coordinates3DLinkedList();
+        List<Coordinates3D> visited = new ArrayList<>();
+        Random rand = new Random();
+
+        Coordinates3D at = startC3d;
+        while (at != null) {
+            visited.add(at);
+            path.add(at);
+
+            // get all edges
+            List<Edge> el = graph.adjacencylist.get(at);
+            List<Edge> edgesList = new LinkedList<>();
+
+            // remove edges with visited destinations from el
+            for(Edge e : el) {
+                if(!visited.contains(e.destination)) edgesList.add(e);
+            }
+
+            // calculating transit desires for every path
+            HashMap<Edge, Double> transitionDesire = new HashMap<>();
+            for(Edge e : edgesList) {
+                Double prximity = proximity_reduce_constant / e.weight;
+                Double pheromones = pheromoneHashMap.get(e);
+                Double desire = 
+                    Math.pow(prximity, pheromone_influence_factor) +
+                    Math.pow(pheromones, heurisic_influence_factor);
+                transitionDesire.put(e, desire);
+            }
+
+            // calculating sum of all desires
+            Double sumDesires = 0.0;
+            for(Edge e : edgesList) {
+                sumDesires += transitionDesire.get(e);
+            }
+
+            // calculating probability of transit to each path
+            HashMap<Edge, Double> transitionProbability = new HashMap<>();
+            for(Edge e : edgesList) {
+                Double currDesire = transitionDesire.get(e);
+                transitionProbability.put(e, currDesire / sumDesires);
+            }
+
+            // choosing a path which the ant will go
+            Double local_sum = 0.0;
+            Double transition_point = rand.nextDouble();
+            Coordinates3D next = null;
+            for(Edge e : edgesList) {
+                local_sum += transitionProbability.get(e);
+                if(local_sum >= transition_point) {
+                    next = e.destination;
+                    break;
+                }
+            }
+            
+            at = next;
+        }
+        path.add(startC3d);
+        
+        return path;
+    }
+
+    private static Coordinates3D getRandomC3d(Graph graph) {
+        if(graph == null) return null;
+        if(graph.verticesList.isEmpty()) return null;
+
+        Random rand = new Random();
+        return graph.verticesList.get(rand.nextInt(graph.verticesList.size()));
+    }
+
+    private static void evaporatePheromones(HashMap<Edge, Double> pheromoneHashMap, Double pheromone_evaporation_rate) {
+        for(Edge e : pheromoneHashMap.keySet()) {
+            Double pheromone_value = pheromoneHashMap.get(e);
+            Double new_pheromone_value = pheromone_value * pheromone_evaporation_rate;
+            pheromoneHashMap.put(e, new_pheromone_value);
+        }
+    }
+
+    private static Coordinates3DLinkedList ACO(
+        Graph graph,
+        Coordinates3D startNode,
+        Integer number_of_ants,
+        Double pheromone_evaporation_rate,
+        Double pheromone_influence_factor,
+        Double heurisic_influence_factor,
+        Integer number_of_generations,
+        Boolean use_random_ants
+        ) {
+
+        Double initial_pheromone_value = 0.2;
+        Double this_wierd_Q = 1.0;
+
+        // iniciate pheromone values on all paths
+        HashMap<Edge, Double> pheromoneHashMap = new HashMap<>();
+        for(Coordinates3D c3d : graph.verticesList) {
+            LinkedList<Edge> edgesLinkedList = graph.adjacencylist.get(c3d);
+            for(Edge e : edgesLinkedList) {
+                pheromoneHashMap.put(e, initial_pheromone_value);
+            }
+        }
+
+        for(int i = 0; i < number_of_generations; i++) {
+
+            if(use_random_ants) {
+                for(int ant = 0; ant < number_of_ants; ant++) {
+                    Coordinates3DLinkedList path = getAntPath(
+                                                        graph,
+                                                        getRandomC3d(graph),
+                                                        pheromoneHashMap,
+                                                        pheromone_influence_factor,
+                                                        heurisic_influence_factor
+                                                    );
+            
+                    updatePheromonesValue(graph, pheromoneHashMap, this_wierd_Q, path);
+                }
+            }
+            else {
+                for(Coordinates3D sNode : graph.verticesList) {
+                    Coordinates3DLinkedList path = getAntPath(
+                                                        graph,
+                                                        sNode,
+                                                        pheromoneHashMap,
+                                                        pheromone_influence_factor,
+                                                        heurisic_influence_factor
+                                                    );
+            
+                    updatePheromonesValue(graph, pheromoneHashMap, this_wierd_Q, path);
+                }
+            }
+
+            evaporatePheromones(pheromoneHashMap, pheromone_evaporation_rate);
+        }
+
+        return getAntPath(graph, startNode, pheromoneHashMap, pheromone_influence_factor, heurisic_influence_factor);
     }
 
 }

@@ -22,6 +22,9 @@ public class App {
         Infos aStar = SalesmanProblemAlgorithms.tryAStar(g, startNode);
         System.out.println(" A* -> " + aStar.toString());
 
+        Infos aco = SalesmanProblemAlgorithms.tryACO(g, startNode);
+        System.out.println("ACO -> " + aco.toString());
+
         if(
             (g.vertices > 13 && !isSymetrical) ||
             (g.vertices > 12 && isSymetrical)

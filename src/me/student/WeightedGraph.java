@@ -61,6 +61,15 @@ public class WeightedGraph {
             adjacencylist.get(source).add(edge);
         }
 
+        public Edge getEdge(Coordinates3D source, Coordinates3D destination) {
+            List<Edge> edgesLinkedList = adjacencylist.get(source);
+            for(Edge e : edgesLinkedList) {
+                if(e.destination == destination) return e;
+            }
+
+            return null;
+        }
+
         /**
          * Reduces the edges but always keeps at least one edge
          * for each node. Returns percent of all reduced eges.

@@ -167,6 +167,10 @@ public class Coordinates3D {
 
         public Integer size() { return linkedList.size(); }
 
+        public Coordinates3D get(int index) {
+            return this.linkedList.get(index);
+        }
+
         public String toString() {
             if(linkedList.size() == 0) return "empty";
             String ans = "";
