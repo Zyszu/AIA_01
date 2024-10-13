@@ -154,8 +154,11 @@ public class SalesmanProblemAlgorithms {
             for(Edge e : edgesList) {
                 Coordinates3D next = e.destination;
                 if(isVisited.contains(next)) continue;
-                if(at.getDistanceTo(next) < shortestDistance)
+                if(at.getDistanceTo(next) < shortestDistance) {
                     closesCoordinates3d = next;
+                    shortestDistance = at.getDistanceTo(next);
+                }
+
             }
             at = closesCoordinates3d;
         }
@@ -163,4 +166,73 @@ public class SalesmanProblemAlgorithms {
         return shortestPath;
     }
     
+    public static Infos tryAStar(Graph graph, Coordinates3D startNode) {
+        long tStart = System.currentTimeMillis();
+
+        Coordinates3DLinkedList shortestPath = aStar(graph, startNode);
+
+        long tEnd = System.currentTimeMillis();
+        return new Infos(tEnd - tStart, 0, shortestPath);
+    }
+
+    private static Coordinates3D getFarthestC3d(Coordinates3D at, List<Coordinates3D> c3dll) {
+        if(c3dll == null)   return null;
+        if(c3dll.isEmpty()) return null;
+
+        Coordinates3D farthestC3d = c3dll.removeFirst();
+
+        for(Coordinates3D c3d : c3dll) {
+            if(at.getDistanceTo(c3d) > at.getDistanceTo(farthestC3d))
+                farthestC3d = c3d;
+        }
+
+        return farthestC3d;
+    }
+
+    private static Coordinates3DLinkedList aStar(Graph graph, Coordinates3D startNode) {
+        List<Coordinates3D> visited = new ArrayList<>();
+        List<Coordinates3D> unVisited = new ArrayList<>(graph.verticesList);
+
+        Coordinates3DLinkedList shortestPath = new Coordinates3DLinkedList();
+        Coordinates3D at = startNode;
+
+        Double heuristicInfluence = 100.0;
+
+        while (at != null) {
+            visited.add(at);
+            unVisited.remove(at);
+            shortestPath.add(at);
+
+            Coordinates3D closesCoordinates3d = null;
+            Double distanceShortest = Double.MAX_VALUE;
+
+            List<Edge> edgesList = graph.adjacencylist.get(at);
+            for(Edge e : edgesList) {
+                Coordinates3D next = e.destination;
+                if(visited.contains(next)) continue;
+
+                Double heuristicNext     = 0.0;
+                Double heuristicShortest = 0.0;
+
+                if(closesCoordinates3d != null) {
+                    Coordinates3D fc = getFarthestC3d(at, unVisited);
+                    if(fc != null) {
+                        heuristicNext     =                next.getDistanceTo(fc) * heuristicInfluence;
+                        heuristicShortest = closesCoordinates3d.getDistanceTo(fc) * heuristicInfluence;
+                    }
+                }
+
+                Double d1 = at.getDistanceTo(next) + heuristicNext;
+                Double d2 = distanceShortest + heuristicShortest;
+
+                if(d1 < d2) {
+                    closesCoordinates3d = next;
+                    distanceShortest = at.getDistanceTo(next);
+                }
+            }
+            at = closesCoordinates3d;
+        }
+        shortestPath.add(startNode);
+        return shortestPath;
+    }
 }

@@ -33,15 +33,15 @@ public class Coordinates3D {
     public Double getDistanceTo(Coordinates3D coordinates) {
         if (coordinates == null) return null;
 
-        Double newZ = Double.valueOf(coordinates.z);
-        if(this.z > coordinates.z) newZ *= 0.9;
-        if(this.z < coordinates.z) newZ *= 1.1;
-
-        return Math.sqrt(
+        Double ans = Math.sqrt(
             Math.pow(this.x - coordinates.x, 2) +
             Math.pow(this.y - coordinates.y, 2) +
-            Math.pow(this.z - newZ,          2)
+            Math.pow(this.z - coordinates.z, 2)
         );
+
+        if(this.z > coordinates.z) return ans * 0.9;
+        if(this.z < coordinates.z) return ans * 1.1;
+        return ans;
     }
 
     public static String toString(Coordinates3D c) {
