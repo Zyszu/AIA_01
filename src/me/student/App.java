@@ -1,51 +1,82 @@
 package me.student;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 import me.student.WeightedGraph.Graph;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        Boolean isSymetrical = true;
-        Graph g = new Graph(10, isSymetrical);
-        Coordinates3D startNode = SalesmanProblemAlgorithms.getStartNode(g);
+        final Boolean isSymetrical = false;
+        final long seed = 2115;
+        String fileName = isSymetrical ? "data_symetrical.txt" : "data_asymetrical.txt";
+        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        
+        for(int i = 5; i < 16; i++) {
+            String msg = "number_of_vertices = " + String.valueOf(i) + " | seed = " + String.valueOf(seed) + '\n';
+            System.out.print(msg);
+            writer.append(msg);
 
-        if(!isSymetrical)
-            System.out.println("graph edges reduced by: " + g.reduceEdges(20) + "%");
-        // g.printGraph();
+            Graph g = new Graph(i, isSymetrical, seed);
+            Coordinates3D startNode = SalesmanProblemAlgorithms.getStartNode(g);
 
-        // Because it is always taking the shortest path it
-        // not always retruns all the nodes. The last node 
-        // it's visiting might not be connected to some
-        // remaning nodes.
-        Infos nn = SalesmanProblemAlgorithms.tryNN(g, startNode);
-        System.out.println(" NN -> " + nn.toString());
+            if(!isSymetrical)
+                g.reduceEdges(20) ;
+                // System.out.println("graph edges reduced by: " + g.reduceEdges(20) + "%");
+            // g.printGraph();
 
-        Infos aStar = SalesmanProblemAlgorithms.tryAStar(g, startNode);
-        System.out.println(" A* -> " + aStar.toString());
+            // Because it is always taking the shortest path it
+            // not always retruns all the nodes. The last node 
+            // it's visiting might not be connected to some
+            // remaning nodes.
+            Infos nn = SalesmanProblemAlgorithms.tryNN(g, startNode);
+            msg = " NN -> " + nn.toString() + '\n';
+            System.out.print(msg);
+            writer.append(msg);
 
-        Infos aco = SalesmanProblemAlgorithms.tryACO(g, startNode);
-        System.out.println("ACO -> " + aco.toString());
+            Infos aStar = SalesmanProblemAlgorithms.tryAStar(g, startNode);
+            msg = " A* -> " + aStar.toString() + '\n';
+            System.out.print(msg);
+            writer.append(msg);
 
-        if(
-            (g.vertices > 13 && !isSymetrical) ||
-            (g.vertices > 12 && isSymetrical)
-        ) return;
+            Infos aco = SalesmanProblemAlgorithms.tryACO(g, startNode);
+            msg = "ACO -> " + aco.toString() + '\n';
+            System.out.print(msg);
+            writer.append(msg);
 
-        // [ToDo]
-        // Something is wrong with DFS method. Sometime it
-        // retruns path that is longer than BFS method
-        Infos dfs = SalesmanProblemAlgorithms.tryDFS(g, startNode);
-        System.out.println("DFS -> " + dfs.toString());
-        // System.out.println(dfs.getPath().toString());
+            if(
+                (g.vertices > 13 && !isSymetrical) ||
+                (g.vertices > 12 && isSymetrical)
+            ) {
+                msg = "DFS -> no data (too big memmory consumption)\n";
+                System.out.print(msg);
+                writer.append(msg);
+            } else {
+                // [ToDo]
+                // Something is wrong with DFS method. Sometime it
+                // retruns path that is longer than BFS method
+                Infos dfs = SalesmanProblemAlgorithms.tryDFS(g, startNode);
+                msg = "DFS -> " + dfs.toString() + '\n';
+                System.out.print(msg);
+                writer.append(msg);
+            }
 
-        if(
-            (g.vertices > 12 && !isSymetrical) ||
-            (g.vertices > 11 && isSymetrical)
-        ) return;
+            if(
+                (g.vertices > 12 && !isSymetrical) ||
+                (g.vertices > 11 && isSymetrical)
+            ) {
+                msg = "BFS -> no data (too big memmory consumption)\n";
+                System.out.print(msg);
+                writer.append(msg);
+            } else {
+                // just works :)
+                Infos bfs = SalesmanProblemAlgorithms.tryBFS(g, startNode);
+                msg = "BFS -> " + bfs.toString() + '\n';
+                System.out.print(msg);
+                writer.append(msg);
+            }
+        }
 
-        // just works :)
-        Infos bfs = SalesmanProblemAlgorithms.tryBFS(g, startNode);
-        System.out.println("BFS -> " + bfs.toString());
-        // System.out.println(bfs.getPath().toString());
-
+        writer.close();
     }
 }

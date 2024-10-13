@@ -224,12 +224,16 @@ public class SalesmanProblemAlgorithms {
     }
 
     public static Infos tryACO(Graph graph, Coordinates3D startNode) {
-        Integer number_of_ants              = 100;
-        Double  pheromone_evaporation_rate  = 0.1;
-        Double  pheromone_influence_factor  = 2.2; // alpha
-        Double  heurisic_influence_factor   = 1.0; // beta
-        Integer number_of_generations       = 50;
-        Boolean use_random_ants             = true;
+        final Boolean use_random_ants             = true;
+        final Integer number_of_ants              = 100;
+        final Integer number_of_generations       = 100;
+        final Double  pheromone_evaporation_rate  = 0.1;
+        final Double  pheromone_influence_factor  = 5.0; // alpha
+        final Double  heurisic_influence_factor   = 0.8; // beta
+
+        final Double initial_pheromone_value = 0.5;
+        final Double this_wierd_Q = 10.0;
+        final Double proximity_reduce_constant = 1000.0;
 
         long tStart = System.currentTimeMillis();
         Coordinates3DLinkedList shortesPath = ACO(
@@ -240,7 +244,10 @@ public class SalesmanProblemAlgorithms {
                                                     pheromone_influence_factor,
                                                     heurisic_influence_factor,
                                                     number_of_generations,
-                                                    use_random_ants
+                                                    use_random_ants,
+                                                    initial_pheromone_value,
+                                                    this_wierd_Q,
+                                                    proximity_reduce_constant
                                                 );
         // end
         long tEnd = System.currentTimeMillis();
@@ -249,10 +256,11 @@ public class SalesmanProblemAlgorithms {
 
     private static void updatePheromonesValue(Graph graph, HashMap<Edge, Double> pheromoneHashMap, Double this_wierd_Q, Coordinates3DLinkedList path) {
         for(int i = 0; i < path.size() - 1; i++) {
-            Coordinates3D atNode = path.get(i);
-            Coordinates3D nextNode = path.get(i + 1);
+            Coordinates3D atNode     = path.get(i);
+            Coordinates3D nextNode   = path.get(i + 1);
 
             Edge edge = graph.getEdge(atNode, nextNode);
+            if(edge == null) continue;
             Double prev_pheromones   = pheromoneHashMap.get(edge);
             Double new_pheromones    = this_wierd_Q / path.getPathDistance();
             Double pheromones_update = prev_pheromones + new_pheromones;
@@ -266,9 +274,9 @@ public class SalesmanProblemAlgorithms {
         Coordinates3D startC3d,
         HashMap<Edge, Double> pheromoneHashMap,
         Double pheromone_influence_factor,
-        Double heurisic_influence_factor
+        Double heurisic_influence_factor,
+        Double proximity_reduce_constant
         ) {
-        Double proximity_reduce_constant = 10.0;
         Coordinates3DLinkedList path = new Coordinates3DLinkedList();
         List<Coordinates3D> visited = new ArrayList<>();
         Random rand = new Random();
@@ -341,7 +349,7 @@ public class SalesmanProblemAlgorithms {
     private static void evaporatePheromones(HashMap<Edge, Double> pheromoneHashMap, Double pheromone_evaporation_rate) {
         for(Edge e : pheromoneHashMap.keySet()) {
             Double pheromone_value = pheromoneHashMap.get(e);
-            Double new_pheromone_value = pheromone_value * pheromone_evaporation_rate;
+            Double new_pheromone_value = pheromone_value * (1.0 - pheromone_evaporation_rate);
             pheromoneHashMap.put(e, new_pheromone_value);
         }
     }
@@ -354,11 +362,11 @@ public class SalesmanProblemAlgorithms {
         Double pheromone_influence_factor,
         Double heurisic_influence_factor,
         Integer number_of_generations,
-        Boolean use_random_ants
+        Boolean use_random_ants,
+        Double initial_pheromone_value,
+        Double this_wierd_Q,
+        Double proximity_reduce_constant
         ) {
-
-        Double initial_pheromone_value = 0.2;
-        Double this_wierd_Q = 1.0;
 
         // iniciate pheromone values on all paths
         HashMap<Edge, Double> pheromoneHashMap = new HashMap<>();
@@ -370,7 +378,6 @@ public class SalesmanProblemAlgorithms {
         }
 
         for(int i = 0; i < number_of_generations; i++) {
-
             if(use_random_ants) {
                 for(int ant = 0; ant < number_of_ants; ant++) {
                     Coordinates3DLinkedList path = getAntPath(
@@ -378,7 +385,8 @@ public class SalesmanProblemAlgorithms {
                                                         getRandomC3d(graph),
                                                         pheromoneHashMap,
                                                         pheromone_influence_factor,
-                                                        heurisic_influence_factor
+                                                        heurisic_influence_factor,
+                                                        proximity_reduce_constant
                                                     );
             
                     updatePheromonesValue(graph, pheromoneHashMap, this_wierd_Q, path);
@@ -391,7 +399,8 @@ public class SalesmanProblemAlgorithms {
                                                         sNode,
                                                         pheromoneHashMap,
                                                         pheromone_influence_factor,
-                                                        heurisic_influence_factor
+                                                        heurisic_influence_factor,
+                                                        proximity_reduce_constant
                                                     );
             
                     updatePheromonesValue(graph, pheromoneHashMap, this_wierd_Q, path);
@@ -401,7 +410,7 @@ public class SalesmanProblemAlgorithms {
             evaporatePheromones(pheromoneHashMap, pheromone_evaporation_rate);
         }
 
-        return getAntPath(graph, startNode, pheromoneHashMap, pheromone_influence_factor, heurisic_influence_factor);
+        return getAntPath(graph, startNode, pheromoneHashMap, pheromone_influence_factor, heurisic_influence_factor, proximity_reduce_constant);
     }
 
 }

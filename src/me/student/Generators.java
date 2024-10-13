@@ -36,8 +36,8 @@ public class Generators {
 
     }
 
-    public static Coordinates3D getRandomCoordinates3d(Interval x, Interval y, Interval z, Boolean isSimetrical) {
-        Random rand = new Random();
+    public static Coordinates3D getRandomCoordinates3d(Interval x, Interval y, Interval z, Boolean isSimetrical, long seed) {
+        Random rand = new Random(seed);
 
         Integer newX = rand.nextInt(x.length) + x.getStart();
         Integer newY = rand.nextInt(y.length) + y.getStart();
