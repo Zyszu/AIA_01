@@ -8,9 +8,9 @@ import me.student.WeightedGraph.Graph;
 public class App {
     public static void main(String[] args) throws Exception {
         final Boolean isSymetrical = false;
-        final long seed = 2115;
-        String fileName = isSymetrical ? "data_symetrical.txt" : "data_asymetrical.txt";
-        BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+        final long seed            = 2115;
+        String fileName            = isSymetrical ? "data_symetrical.txt" : "data_asymetrical.txt";
+        BufferedWriter writer      = new BufferedWriter(new FileWriter(fileName));
         
         for(int i = 5; i < 16; i++) {
             String msg = "number_of_vertices = " + String.valueOf(i) + " | seed = " + String.valueOf(seed) + '\n';
@@ -21,7 +21,7 @@ public class App {
             Coordinates3D startNode = SalesmanProblemAlgorithms.getStartNode(g);
 
             if(!isSymetrical)
-                g.reduceEdges(20) ;
+                g.reduceEdges(20, seed) ;
                 // System.out.println("graph edges reduced by: " + g.reduceEdges(20) + "%");
             // g.printGraph();
 
@@ -48,7 +48,7 @@ public class App {
                 (g.vertices > 13 && !isSymetrical) ||
                 (g.vertices > 12 && isSymetrical)
             ) {
-                msg = "DFS -> no data (too big memmory consumption)\n";
+                msg = "DFS -> no data (too big memory consumption)\n";
                 System.out.print(msg);
                 writer.append(msg);
             } else {
@@ -65,7 +65,7 @@ public class App {
                 (g.vertices > 12 && !isSymetrical) ||
                 (g.vertices > 11 && isSymetrical)
             ) {
-                msg = "BFS -> no data (too big memmory consumption)\n";
+                msg = "BFS -> no data (too big memory consumption)\n";
                 System.out.print(msg);
                 writer.append(msg);
             } else {

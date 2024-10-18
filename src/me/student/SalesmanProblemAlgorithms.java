@@ -21,12 +21,12 @@ public class SalesmanProblemAlgorithms {
     }
 
     public static Infos tryDFS(Graph graph, Coordinates3D startNode) {
-        long tStart = System.currentTimeMillis();
+        long tStart = System.nanoTime();
 
         List<Coordinates3D> isVisited = new ArrayList<>();
         Coordinates3DLinkedList shortestPath = DFS(startNode, startNode, graph, isVisited);
 
-        long tEnd = System.currentTimeMillis();
+        long tEnd = System.nanoTime();
         return new Infos(tEnd - tStart, 0, shortestPath);
     }
 
@@ -74,11 +74,11 @@ public class SalesmanProblemAlgorithms {
     }
 
     public static Infos tryBFS(Graph graph, Coordinates3D startNode) {
-        long tStart = System.currentTimeMillis();
+        long tStart = System.nanoTime();
 
         Coordinates3DLinkedList shortestPath = BFS(graph, startNode);
 
-        long tEnd = System.currentTimeMillis();
+        long tEnd = System.nanoTime();
         return new Infos(tEnd-tStart, 0, shortestPath);
     }
 
@@ -119,9 +119,9 @@ public class SalesmanProblemAlgorithms {
     }
 
     public static Infos tryNN(Graph graph, Coordinates3D startNode) { 
-        long tStart = System.currentTimeMillis();
+        long tStart = System.nanoTime();
         Coordinates3DLinkedList shortestPath = NN(graph, startNode);
-        long tEnd = System.currentTimeMillis();
+        long tEnd = System.nanoTime();
         return new Infos(tEnd - tStart, 0, shortestPath);
     }
 
@@ -154,11 +154,11 @@ public class SalesmanProblemAlgorithms {
     }
     
     public static Infos tryAStar(Graph graph, Coordinates3D startNode) {
-        long tStart = System.currentTimeMillis();
+        long tStart = System.nanoTime();
 
         Coordinates3DLinkedList shortestPath = aStar(graph, startNode);
 
-        long tEnd = System.currentTimeMillis();
+        long tEnd = System.nanoTime();
         return new Infos(tEnd - tStart, 0, shortestPath);
     }
 
@@ -225,17 +225,17 @@ public class SalesmanProblemAlgorithms {
 
     public static Infos tryACO(Graph graph, Coordinates3D startNode) {
         final Boolean use_random_ants             = true;
-        final Integer number_of_ants              = 100;
+        final Integer number_of_ants              = 1000;
         final Integer number_of_generations       = 100;
-        final Double  pheromone_evaporation_rate  = 0.1;
-        final Double  pheromone_influence_factor  = 5.0; // alpha
+        final Double  pheromone_evaporation_rate  = 0.01;
+        final Double  pheromone_influence_factor  = 2.5; // alpha
         final Double  heurisic_influence_factor   = 0.8; // beta
 
-        final Double initial_pheromone_value = 0.5;
+        final Double initial_pheromone_value = 1.0;
         final Double this_wierd_Q = 10.0;
         final Double proximity_reduce_constant = 1000.0;
 
-        long tStart = System.currentTimeMillis();
+        long tStart = System.nanoTime();
         Coordinates3DLinkedList shortesPath = ACO(
                                                     graph,
                                                     startNode,
@@ -250,7 +250,7 @@ public class SalesmanProblemAlgorithms {
                                                     proximity_reduce_constant
                                                 );
         // end
-        long tEnd = System.currentTimeMillis();
+        long tEnd = System.nanoTime();
         return new Infos(tEnd - tStart, 0, shortesPath);
     }
 
@@ -301,8 +301,8 @@ public class SalesmanProblemAlgorithms {
                 Double prximity = proximity_reduce_constant / e.weight;
                 Double pheromones = pheromoneHashMap.get(e);
                 Double desire = 
-                    Math.pow(prximity, pheromone_influence_factor) +
-                    Math.pow(pheromones, heurisic_influence_factor);
+                    Math.pow(prximity, heurisic_influence_factor) +
+                    Math.pow(pheromones, pheromone_influence_factor);
                 transitionDesire.put(e, desire);
             }
 

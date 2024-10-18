@@ -74,10 +74,10 @@ public class WeightedGraph {
          * Reduces the edges but always keeps at least one edge
          * for each node. Returns percent of all reduced eges.
          */
-        public Double reduceEdges(Integer percent) {
+        public Double reduceEdges(Integer percent, long seed) {
             if(percent < 0 || percent > 100) return null;
             if(adjacencylist.isEmpty()) return null;
-            Random rand = new Random();
+            Random rand = new Random(seed);
 
             Integer countEdges = 0;
 
